@@ -32,12 +32,12 @@ class TransformTextByKeyWord implements ITransformTextToMatrix
     public function transform(array $arDocuments): array
     {
         $M = [];
+        $maths = [];
         for ($i = 0; $i < count($arDocuments); $i ++) {
             $M[$i] = [];
             for($j = 0; $j < count($this->keyWords); $j ++) {
-                $maths = [];
                 if(preg_match_all("/{$this->keyWords[$j]}/Ui", $arDocuments[$i], $maths)) {
-                    $M[$i][$j] = 1;//count($maths[0]);
+                    $M[$i][$j] = count($maths[0]);
                 } else {
                     $M[$i][$j] = 0;
                 }

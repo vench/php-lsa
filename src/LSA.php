@@ -57,30 +57,19 @@ class LSA
      */
     public function fitTransform(array $arDocuments):array {
         $M = $this->textTransform($arDocuments);
+        $M = trans($M);
         list($U, $V, $S) = svd($M);
-
         $min = min($this->nFeatures, count($M), count($M[0]));
-
-        //M 5x14
-        //U 5x14 ~ 5x5
-        //V 14x14
-        //S 5x5
-
-
         trunc($U, count($M), $min);
         trunc($V, count($M[0]), $min);
 
-       // print_r($V);
-       // exit();
-
-        $this->components = $V;
-        //$VT = trans($V);
-      //  print_r()
+        $this->components = $U;
+        $VT = trans($V);
 
         $result = [];
-        for ($i = 0; $i < count($U); $i ++) {
-            for ($j = 0; $j < count($U[0]); $j ++) {
-                $result[$i][$j] = $U[$i][$j] * $S[$i][$i];
+        for ($i = 0; $i < count($VT); $i ++) {
+            for ($j = 0; $j < count($VT[0]); $j ++) {
+                $result[$i][$j] = $VT[$i][$j] * $S[$i][$i];
             }
         }
 
@@ -101,11 +90,7 @@ class LSA
     public function transform(array $arDocuments):array {
         $M = $this->textTransform($arDocuments);
         $ct = trans($this->components);
-        //$ct = $this->components;
-       // print_r(count($this->components)); //4x14 | 1x14
-        //exit();
-        //return [];
-        return mult($M, $this->components);
+        return mult($ct, trans($M));
     }
 
     /**
