@@ -7,8 +7,25 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class PhpLsaTestCase
  */
-class PhpLsaTestCase extends TestCase
+class TestPhpLib extends TestCase
 {
+
+
+    public function testTrunc() {
+        $A = [
+                [1,2,3,4],
+                [5,6,7,8],
+            ];
+        PHPLsa\trunc($A, 2, 2);
+
+        $this->assertTrue(count($A) == 2);
+        $this->assertTrue(count($A[0]) == 2);
+
+        $this->assertTrue($A[0][0] == 1);
+        $this->assertTrue($A[0][1] == 2);
+        $this->assertTrue($A[1][0] == 5);
+        $this->assertTrue($A[1][1] == 6);
+    }
 
     /**
      * @return array

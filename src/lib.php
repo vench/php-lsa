@@ -64,6 +64,22 @@ function constr(array $A, int $rows, int $cols):array{
 }
 
 /**
+ * @param array $A
+ * @param int $rows
+ * @param int $cols
+ */
+function trunc(array &$A, int $rows, int $cols) {
+    for($i = 0; $i < count($A); $i ++) {
+        if($i > $rows) {
+            array_splice($A, $rows);
+            break;
+        } else {
+            array_splice($A[$i], $cols);
+        }
+    }
+}
+
+/**
  * @param float $a
  * @param float $b
  * @return float
@@ -93,7 +109,6 @@ function pythag(float $a, float $b):float{
         return $absb * sqrt( 1.0 + pow( $absa / $absb, 2 ) );
     }
     return 0.0;
-
 }
 
 /**
