@@ -20,6 +20,11 @@ class TransformTextWordBool implements ITransformTextToMatrix
     private $wordDict;
 
     /**
+     * @var string
+     */
+    private $pattern = '/\b\w+\b/Ui';
+
+    /**
      * TransformTextWordBool constructor.
      * @param int $nMaxWords
      * @param array $wordDict
@@ -37,19 +42,20 @@ class TransformTextWordBool implements ITransformTextToMatrix
      */
     public function transform(array $arDocuments): array
     {
+
         $result = [];
         for($i = 0; $i < count($arDocuments); $i ++) {
             $maths = [];
             $result[$i] = array_fill(0, $this->nMaxWords, 0);
-            preg_match_all('/\b\w+\b/Ui', $arDocuments[$i], $maths);
+            preg_match_all($this->pattern, $arDocuments[$i], $maths);
             if(isset($maths[0])) {
                 foreach ($maths[0] as $word) {
                     $word = $this->processedWord($word);
                     if(isset($this->wordDict[$word])) {
-                        $this->setValueToResult($result[$i][$this->wordDict[$word]], 1);
+                        $this->setValueToResult($result[$this->wordDict[$word]][$i], 1);
                     } else if($this->nMaxWords > count($this->wordDict)) {
                         $this->wordDict[$word] = count($this->wordDict);
-                        $this->setValueToResult($result[$i][$this->wordDict[$word]], 1);
+                        $this->setValueToResult($result[$this->wordDict[$word]][$i], 1);
                     }
                 }
             }
@@ -72,6 +78,7 @@ class TransformTextWordBool implements ITransformTextToMatrix
     public function processedWord($word) {
         return mb_strtolower($word);
     }
+
 
     /**
      * @param int $address

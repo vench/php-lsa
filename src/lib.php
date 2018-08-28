@@ -92,6 +92,17 @@ function sameSign(float $a, float $b):float {
 }
 
 /**
+ * @param array $A
+ */
+function show(array $A) {
+    print "\n";
+    for($i = 0; $i < count($A); $i ++) {
+        print join(", ", array_map(function ($x) { return round($x, 6);}, $A[$i]));
+        print "\n";
+    }
+}
+
+/**
  * @param float $a
  * @param float $b
  * @return float

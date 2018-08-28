@@ -33,6 +33,11 @@ class LSA
     private $textTransformer= null;
 
     /**
+     * @var TfidfText
+     */
+    private $tfidfText = null;
+
+    /**
      * @var array
      */
     private $components = [];
@@ -57,14 +62,23 @@ class LSA
      */
     public function fitTransform(array $arDocuments):array {
         $M = $this->textTransform($arDocuments);
-        $M = trans($M);
+        $M = $this->getTfidfText()->fitTransform($M);
+
         list($U, $V, $S) = svd($M);
+        //show($S); exit();
+        //show(trans($V));
+        //show($U); exit();
         $min = min($this->nFeatures, count($M), count($M[0]));
         trunc($U, count($M), $min);
-        trunc($V, count($M[0]), $min);
+       // trunc($V, $min, count($M[0]));
 
+        $V = trans($V);
+        trunc($V, count($M[0]), $min);
+        $V = trans($V);
+
+       // show(trans($V)); exit();
         $this->components = $U;
-        $VT = trans($V);
+        $VT = $V;//trans($V);//
 
         $result = [];
         for ($i = 0; $i < count($VT); $i ++) {
@@ -72,6 +86,9 @@ class LSA
                 $result[$i][$j] = $VT[$i][$j] * $S[$i][$i];
             }
         }
+
+       // show($S); exit();
+//        show($result); exit();
 
         return $result;
     }
@@ -89,8 +106,16 @@ class LSA
      */
     public function transform(array $arDocuments):array {
         $M = $this->textTransform($arDocuments);
-        $ct = trans($this->components);
-        return mult($ct, trans($M));
+        //$ct = trans($this->components);
+        //$M = trans($M);
+        $ct = trans($this->components); //19x4
+       // print_r($M); exit();
+
+        $t = $this->getTfidfText();
+        $M = $t->transform($M);
+
+
+        return mult($ct,  $M);
     }
 
     /**
@@ -126,6 +151,19 @@ class LSA
 
     }
 
+
+    /**
+     * @return TfidfText
+     */
+    public function getTfidfText() {
+        if(is_null($this->tfidfText)) {
+            $this->tfidfText = new TfidfText();
+        }
+        return $this->tfidfText;
+    }
+
+
+
     /**
      * @param array $arDocuments
      * @return array
@@ -134,6 +172,7 @@ class LSA
         return $this->getTextTransformer()
             ->transform(array_slice($arDocuments, 0, $this->nMaxDocuments));
     }
+
 
 
 }
