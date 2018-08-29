@@ -65,7 +65,7 @@ class LSA
         $M = $this->getTfidfText()->fitTransform($M);
 
         list($U, $V, $S) = svd($M);
-        //show($S); exit();
+        //print_r($S); exit();
         //show(trans($V));
         //show($U); exit();
         $min = min($this->nFeatures, count($M), count($M[0]));
@@ -76,14 +76,14 @@ class LSA
         trunc($V, count($M[0]), $min);
         $V = trans($V);
 
-       // show(trans($V)); exit();
+        //show(trans($V)); exit();
         $this->components = $U;
         $VT = $V;//trans($V);//
 
         $result = [];
         for ($i = 0; $i < count($VT); $i ++) {
             for ($j = 0; $j < count($VT[0]); $j ++) {
-                $result[$i][$j] = $VT[$i][$j] * $S[$i][$i];
+                $result[$i][$j] = $VT[$i][$j] * $S[$i];
             }
         }
 
@@ -143,12 +143,44 @@ class LSA
         return $this->textTransformer;
     }
 
+
+    /**
+     * @param $query
+     * @param array $trans
+     * @return int
+     */
+    public function query($query, array $trans) {
+        $qTrans = $this->transform([$query]);
+        $index = -1;
+        $weight = 0;
+        $alpha = 0.0001;
+        for($n = 0; $n < count($trans[0]); $n++) {
+            $sum = 0.0;
+            $sum1 = 0.0;
+            $sum2 = 0.0;
+
+            for($i = 0; $i < count($trans); $i++) {
+                $sum += $trans[$i][$n] * $qTrans[$i][0];
+                $sum1 += $trans[$i][$n] * $trans[$i][$n];
+                $sum2 += $qTrans[$i][0] * $qTrans[$i][0];
+            }
+
+            $w = abs(  $sum / (sqrt($sum1  + $alpha) * sqrt($sum2  + $alpha) ));
+            if($index == -1 || $w > $weight) {
+                $index = $n;
+                $weight = $w;
+            }
+        }
+
+        return $index;
+    }
+
+
     /**
      * @param ITransformTextToMatrix $textTransformer
      */
     public function setTextTransformer(ITransformTextToMatrix $textTransformer) {
         $this->textTransformer = $textTransformer;
-
     }
 
 

@@ -21,21 +21,15 @@ class TestTransformText extends TestCase
         $trans = $t->transform(['What is it?', 'It is cat.']);
 
         $wordDictionary = $t->getWordDictionary();
-        $this->assertTrue(count($wordDictionary) == 4);
+        $this->assertTrue(count($wordDictionary) == 2);
         $this->assertTrue(isset($wordDictionary['what']));
-        $this->assertTrue(isset($wordDictionary['is']));
-        $this->assertTrue(isset($wordDictionary['it']));
         $this->assertTrue(isset($wordDictionary['cat']));
 
         $this->assertTrue($trans[0][0] == 1);
-        $this->assertTrue($trans[0][1] == 1);
-        $this->assertTrue($trans[0][2] == 1);
-        $this->assertTrue($trans[0][3] == 0);
+        $this->assertTrue($trans[0][1] == 0);
 
         $this->assertTrue($trans[1][0] == 0);
         $this->assertTrue($trans[1][1] == 1);
-        $this->assertTrue($trans[1][2] == 1);
-        $this->assertTrue($trans[1][3] == 1);
     }
 
     /**
@@ -43,21 +37,25 @@ class TestTransformText extends TestCase
      */
     public function testTransformTextWordCount() {
         $t = new TransformTextWordCount(100);
-        $trans = $t->transform(['am am it', 'dog cat fish cat']);
+        $trans = $t->transform(['test test eat', 'dog cat fish cat']);
 
         $wordDictionary = $t->getWordDictionary();
         $this->assertTrue(count($wordDictionary) == 5);
 
         $this->assertTrue($trans[0][0] == 2);
-        $this->assertTrue($trans[0][1] == 1);
-        $this->assertTrue($trans[0][2] == 0);
+        $this->assertTrue($trans[0][1] == 0);
 
-        $this->assertTrue($trans[1][0] == 0);
+        $this->assertTrue($trans[1][0] == 1);
         $this->assertTrue($trans[1][1] == 0);
-        $this->assertTrue($trans[1][2] == 1);
-        $this->assertTrue($trans[1][3] == 2);
-        $this->assertTrue($trans[1][4] == 1);
-        $this->assertTrue($trans[1][5] == 0);
+
+        $this->assertTrue($trans[2][0] == 0);
+        $this->assertTrue($trans[2][1] == 1);
+
+        $this->assertTrue($trans[3][0] == 0);
+        $this->assertTrue($trans[3][1] == 2);
+
+        $this->assertTrue($trans[4][0] == 0);
+        $this->assertTrue($trans[4][1] == 1);
     }
 
     /**
@@ -75,15 +73,13 @@ class TestTransformText extends TestCase
 
         $trans = $t->transform($documents);
 
-        $this->assertTrue(count($trans) == count($documents));
+        $this->assertTrue(count($trans[0]) == count($documents));
 
         $tests = [
-            [2,3,0],
-            [2,0,0],
-            [0,0,3],
-            [0,0,1],
+            [2,2,0,0],
+            [3,0,0,0],
+            [0,0,3,1],
         ];
-
 
         for ($i = 0; $i < count($tests); $i ++) {
             for ($j = 0; $j < count($tests[0]); $j ++) {

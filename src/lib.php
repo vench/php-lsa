@@ -3,6 +3,8 @@
 namespace PHPLsa;
 
 
+require 'svd2.php';
+
 /**
  *
  */
@@ -107,7 +109,7 @@ function show(array $A) {
  * @param float $b
  * @return float
  */
-function pythag(float $a, float $b):float{
+function _pythag(float $a, float $b):float{
 
     $absa = abs($a);
     $absb = abs($b);
@@ -126,11 +128,10 @@ function pythag(float $a, float $b):float{
  * @param array $A
  * @return array [U, V^T, S]
  */
-function svd(array $A) {
+function _svd(array $A) {
     $rows = count($A); // $m
     $cols = count($A[0]); // $n
 
-    $k = 3; //TODO ????
     $U  = constr($A, $rows, $cols);
     $V  = constr($A, $cols, $cols);
 

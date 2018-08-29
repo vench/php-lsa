@@ -43,9 +43,6 @@ class TfidfText
      * @return array
      */
     public function transform(array $M): array {
-
-        //print_r($this->transform); exit();
-
         return mult($this->transform, $M);
     }
 }

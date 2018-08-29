@@ -22,7 +22,7 @@ class TransformTextWordBool implements ITransformTextToMatrix
     /**
      * @var string
      */
-    private $pattern = '/\b\w+\b/Ui';
+    private $pattern = '/\b[^0-9\s-\.\,]{3,}\b/ui';
 
     /**
      * TransformTextWordBool constructor.
@@ -35,6 +35,12 @@ class TransformTextWordBool implements ITransformTextToMatrix
         $this->wordDict = $wordDict;
     }
 
+    /**
+     * @param array $M
+     */
+    public function fit(array $M) {
+
+    }
 
     /**
      * @param array $arDocuments
@@ -43,25 +49,31 @@ class TransformTextWordBool implements ITransformTextToMatrix
     public function transform(array $arDocuments): array
     {
 
-        $result = [];
+        $M = array_fill(0, count($this->wordDict),
+                array_fill(0, count($arDocuments), 0)
+            );
+
         for($i = 0; $i < count($arDocuments); $i ++) {
             $maths = [];
-            $result[$i] = array_fill(0, $this->nMaxWords, 0);
             preg_match_all($this->pattern, $arDocuments[$i], $maths);
             if(isset($maths[0])) {
                 foreach ($maths[0] as $word) {
                     $word = $this->processedWord($word);
                     if(isset($this->wordDict[$word])) {
-                        $this->setValueToResult($result[$this->wordDict[$word]][$i], 1);
+                        if(!isset($M[$this->wordDict[$word]][$i])) {
+                            $M[$this->wordDict[$word]] = array_fill(0, count($arDocuments), 0);
+                        }
+                        $this->setValueToResult($M[$this->wordDict[$word]][$i], 1);
                     } else if($this->nMaxWords > count($this->wordDict)) {
                         $this->wordDict[$word] = count($this->wordDict);
-                        $this->setValueToResult($result[$this->wordDict[$word]][$i], 1);
+                        $M[$this->wordDict[$word]] = array_fill(0, count($arDocuments), 0);
+                        $this->setValueToResult($M[$this->wordDict[$word]][$i], 1);
                     }
                 }
             }
         }
 
-        return $result;
+        return $M;
     }
 
     /**
