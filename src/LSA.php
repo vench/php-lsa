@@ -30,12 +30,12 @@ class LSA
     /**
      * @var ITransformTextToMatrix
      */
-    private $textTransformer= null;
+    private $textTransformer = null;
 
     /**
-     * @var TfidfText
+     * @var ILearn[]
      */
-    private $tfidfText = null;
+    private $textMatrixTransformers = [];
 
     /**
      * @var array
@@ -62,23 +62,21 @@ class LSA
      */
     public function fitTransform(array $arDocuments):array {
         $M = $this->textTransform($arDocuments);
-        $M = $this->getTfidfText()->fitTransform($M);
+
+        foreach ($this->textMatrixTransformers as $textMatrixTransformer) {
+            $M = $textMatrixTransformer->fitTransform($M);
+        }
 
         list($U, $V, $S) = svd($M);
-        //print_r($S); exit();
-        //show(trans($V));
-        //show($U); exit();
         $min = min($this->nFeatures, count($M), count($M[0]));
         trunc($U, count($M), $min);
-       // trunc($V, $min, count($M[0]));
 
         $V = trans($V);
         trunc($V, count($M[0]), $min);
         $V = trans($V);
 
-        //show(trans($V)); exit();
-        $this->components = $U;
-        $VT = $V;//trans($V);//
+        $this->components = trans($U);
+        $VT = $V;
 
         $result = [];
         for ($i = 0; $i < count($VT); $i ++) {
@@ -86,9 +84,6 @@ class LSA
                 $result[$i][$j] = $VT[$i][$j] * $S[$i];
             }
         }
-
-       // show($S); exit();
-//        show($result); exit();
 
         return $result;
     }
@@ -106,16 +101,10 @@ class LSA
      */
     public function transform(array $arDocuments):array {
         $M = $this->textTransform($arDocuments);
-        //$ct = trans($this->components);
-        //$M = trans($M);
-        $ct = trans($this->components); //19x4
-       // print_r($M); exit();
-
-        $t = $this->getTfidfText();
-        $M = $t->transform($M);
-
-
-        return mult($ct,  $M);
+        foreach ($this->textMatrixTransformers as $textMatrixTransformer) {
+            $M = $textMatrixTransformer->transform($M);
+        }
+        return mult($this->components,  $M);
     }
 
     /**

@@ -6,7 +6,7 @@ namespace PHPLsa;
  * Class TfidfText
  * @package PHPLsa
  */
-class TfidfText
+class TfidfText implements ILearn
 {
 
     /**
@@ -18,7 +18,7 @@ class TfidfText
      * @param array $M
      * @return array
      */
-    public function fitTransform(array $M) {
+    public function fitTransform(array $M):array {
         $this->fit($M);
         return $this->transform($M);
     }
