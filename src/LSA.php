@@ -47,13 +47,19 @@ class LSA
      * @param int $nFeatures
      * @param int $nMaxDocuments
      * @param int $nMaxWords
-     * @param int $typeCount
      */
     function __construct($nFeatures = 5, $nMaxDocuments = 1000, $nMaxWords = 100)
     {
         $this->nFeatures = $nFeatures;
         $this->nMaxDocuments = $nMaxDocuments;
         $this->nMaxWords = $nMaxWords;
+    }
+
+    /**
+     * @param ILearn $matrixTransformer
+     */
+    public function addTextMatrixTransformer(ILearn $matrixTransformer) {
+        $this->textMatrixTransformers[] = $matrixTransformer;
     }
 
     /**
@@ -108,16 +114,16 @@ class LSA
     }
 
     /**
-     *
+     * @param IPersistent $persistent
      */
-    public function save() {
+    public function save(IPersistent $persistent) {
 
     }
 
     /**
-     *
+     * @param IPersistent $persistent
      */
-    public function load() {
+    public function load(IPersistent $persistent) {
 
     }
 
@@ -172,20 +178,7 @@ class LSA
         $this->textTransformer = $textTransformer;
     }
 
-
-    /**
-     * @return TfidfText
-     */
-    public function getTfidfText() {
-        if(is_null($this->tfidfText)) {
-            $this->tfidfText = new TfidfText();
-        }
-        return $this->tfidfText;
-    }
-
-
-
-    /**
+     /**
      * @param array $arDocuments
      * @return array
      */

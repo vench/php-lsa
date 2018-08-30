@@ -5,4 +5,4 @@ Singular value decomposition in PHP implementation language.
 #### TODO
 - [ ] add save data
 - [ ] add load data
-- [ ] change transform
+- [x] change transform

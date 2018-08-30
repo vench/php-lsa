@@ -63,6 +63,7 @@ class TestLSA extends TestCase
 
 
         $lsa = new LSA(4);
+        $lsa->addTextMatrixTransformer(new \PHPLsa\TfidfText());
         $trans = $lsa->fitTransform($documents);
         $this->assertTrue(!empty($trans));
 
