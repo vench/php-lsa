@@ -3,7 +3,6 @@
 namespace PHPLsa;
 
 
-require 'svd2.php';
 
 /**
  *
@@ -125,253 +124,305 @@ function _pythag(float $a, float $b):float{
 }
 
 /**
- * @param array $A
- * @return array [U, V^T, S]
+ * @param float $a
+ * @param float $b
+ * @return float
  */
-function _svd(array $A) {
-    $rows = count($A); // $m
-    $cols = count($A[0]); // $n
+function PYTHAG(float $a, float $b): float
+{
+    $at = abs($a);
+    $bt = abs($b);
 
-    $U  = constr($A, $rows, $cols);
-    $V  = constr($A, $cols, $cols);
+    if ($at > $bt) {
+        $ct = $bt / $at;
+        return $at * sqrt(1.0 + $ct * $ct);
+    } else if ($bt > 0.0) {
+        $ct = $at / $bt;
+        return $bt * sqrt(1.0 + $ct * $ct);
+    }
 
-    $eps = 2.22045e-016;
+    return 0.0;
+}
 
-    //
-    $g = $scale = $anorm = 0.0;
-    for($i = 0; $i < $cols; $i++){
-        $l = $i + 2;
+/**
+ * @param $a
+ * @param $b
+ * @return number
+ */
+function SIGN($a, $b)
+{
+    return (($b) >= 0.0 ? abs($a) : -abs($a));
+}
+
+/**
+ * @param array $a
+ * @param int $m
+ * @param int $n
+ * @param array $w
+ * @param array $v
+ * @return int
+ */
+function dsvd(array &$a, int $m, int $n, array &$w, array &$v)
+{
+    $anorm = 0.0;
+    $g = 0.0;
+    $scale = 0.0;
+    $rv1 = [];
+
+    if ($m < $n) {
+        for($i = 0; $i < $n - $m; $i ++) {
+            $a[] = array_fill(0, $n, 0.0);
+        }
+    }
+
+    /* Householder reduction to bidiagonal form */
+    for ($i = 0; $i < $n; $i++) {
+        /* left-hand reduction */
+        $l = $i + 1;
         $rv1[$i] = $scale * $g;
         $g = $s = $scale = 0.0;
-        if($i < $rows){
-            for($k = $i; $k < $rows; $k++) $scale += abs($U[$k][$i]);
-            if($scale != 0.0) {
-                for($k = $i; $k < $rows; $k++) {
-                    $U[$k][$i] /= $scale;
-                    $s += $U[$k][$i] * $U[$k][$i];
+        if ($i < $m) {
+            for ($k = $i; $k < $m; $k++)
+                $scale += abs((double)$a[$k][$i]);
+            if ($scale) {
+                for ($k = $i; $k < $m; $k++) {
+                    $a[$k][$i] = (double)((double)$a[$k][$i] / $scale);
+                    $s += ((double)$a[$k][$i] * (double)$a[$k][$i]);
                 }
-                $f = $U[$i][$i];
-                $g = - sameSign(sqrt($s), $f);
+                $f = (double)$a[$i][$i];
+                $g = -SIGN(sqrt($s), $f);
                 $h = $f * $g - $s;
-                $U[$i][$i] = $f - $g;
-                for($j = $l - 1; $j < $cols; $j++){
-                    for($s = 0.0, $k = $i; $k < $rows; $k++) $s += $U[$k][$i] * $U[$k][$j];
-                    $f = $s / $h;
-                    for($k = $i; $k < $rows; $k++) $U[$k][$j] += $f * $U[$k][$i];
+                $a[$i][$i] = (double)($f - $g);
+                if ($i != $n - 1) {
+                    for ($j = $l; $j < $n; $j++) {
+                        for ($s = 0.0, $k = $i; $k < $m; $k++)
+                            $s += ((double)$a[$k][$i] * (double)$a[$k][$j]);
+                        $f = $s / $h;
+                        for ($k = $i; $k < $m; $k++)
+                            $a[$k][$j] += (double)($f * (double)$a[$k][$i]);
+                    }
                 }
-                for($k = $i; $k < $rows; $k++) $U[$k][$i] *= $scale;
+                for ($k = $i; $k < $m; $k++)
+                    $a[$k][$i] = (double)((double)$a[$k][$i] * $scale);
             }
         }
-        $W[$i] = $scale * $g;
-        $g = $s = $scale = 0.0;
-        if($i + 1 <= $rows && $i + 1 != $cols){
-            for ($k= $l - 1; $k < $cols; $k++) $scale += abs($U[$i][$k]);
-            if($scale != 0.0){
-                for ($k= $l - 1; $k < $cols; $k++){
-                    $U[$i][$k] /= $scale;
-                    $s += $U[$i][$k] * $U[$i][$k];
-                }
-                $f = $U[$i][$l - 1];
-                $g = - sameSign(sqrt($s), $f);
-                $h = $f * $g - $s;
-                $U[$i][$l - 1] = $f - $g;
-                for($k = $l - 1; $k < $cols; $k++) $rv1[$k] = $U[$i][$k] / $h;
-                for($j = $l - 1; $j < $rows; $j++){
-                    for($s = 0.0, $k = $l - 1; $k < $cols; $k++) $s += $U[$j][$k] * $U[$i][$k];
-                    for($k = $l - 1; $k < $cols; $k++) $U[$j][$k] += $s * $rv1[$k];
-                }
-                for($k= $l - 1; $k < $cols; $k++) $U[$i][$k] *= $scale;
-            }
-        }
-        $anorm = max($anorm, (abs($W[$i]) + abs($rv1[$i])));
-    }
-    //
+        $w[$i] = (double)($scale * $g);
 
-    //
-    for($i = $cols - 1; $i >= 0; $i--){
-        if($i < $cols - 1){
-            if($g != 0.0){
-                for($j = $l; $j < $cols; $j++) // Double division to avoid possible underflow.
-                    $V[$j][$i] = ($U[$i][$j] / $U[$i][$l]) / $g;
-                for($j = $l; $j < $cols; $j++){
-                    for($s = 0.0, $k = $l; $k < $cols; $k++) $s += ($U[$i][$k] * $V[$k][$j]);
-                    for($k = $l; $k < $cols; $k++) $V[$k][$j] += $s * $V[$k][$i];
+        /* right-hand reduction */
+        $g = $s = $scale = 0.0;
+        if ($i < $m && $i != $n - 1) {
+            for ($k = $l; $k < $n; $k++)
+                $scale += abs((double)$a[$i][$k]);
+            if ($scale) {
+                for ($k = $l; $k < $n; $k++) {
+                    $a[$i][$k] = (double)((double)$a[$i][$k] / $scale);
+                    $s += ((double)$a[$i][$k] * (double)$a[$i][$k]);
+                }
+                $f = (double)$a[$i][$l];
+                $g = -SIGN(sqrt($s), $f);
+                $h = $f * $g - $s;
+                $a[$i][$l] = (double)($f - $g);
+                for ($k = $l; $k < $n; $k++)
+                    $rv1[$k] = (double)$a[$i][$k] / $h;
+                if ($i != $m - 1) {
+                    for ($j = $l; $j < $m; $j++) {
+                        for ($s = 0.0, $k = $l; $k < $n; $k++)
+                            $s += ((double)$a[$j][$k] * (double)$a[$i][$k]);
+                        for ($k = $l; $k < $n; $k++)
+                            $a[$j][$k] += (double)($s * $rv1[$k]);
+                    }
+                }
+                for ($k = $l; $k < $n; $k++)
+                    $a[$i][$k] = (double)((double)$a[$i][$k] * $scale);
+            }
+        }
+        $anorm = max($anorm, (abs((double)$w[$i]) + abs($rv1[$i])));
+    }
+
+    /* accumulate the right-hand transformation */
+    for ($i = $n - 1; $i >= 0; $i--) {
+        if ($i < $n - 1) {
+            if ($g) {
+                for ($j = $l; $j < $n; $j++)
+                    $v[$j][$i] = (double)(((double)$a[$i][$j] / (double)$a[$i][$l]) / $g);
+                /* double division to avoid underflow */
+                for ($j = $l; $j < $n; $j++) {
+                    for ($s = 0.0, $k = $l; $k < $n; $k++)
+                        $s += ((double)$a[$i][$k] * (double)$v[$k][$j]);
+                    for ($k = $l; $k < $n; $k++)
+                        $v[$k][$j] += (double)($s * (double)$v[$k][$i]);
                 }
             }
-            for($j = $l; $j < $cols; $j++) $V[$i][$j] = $V[$j][$i] = DF_ZERO;
+            for ($j = $l; $j < $n; $j++)
+                $v[$i][$j] = $v[$j][$i] = 0.0;
         }
-        $V[$i][$i] = 1.0;
+        $v[$i][$i] = 1.0;
         $g = $rv1[$i];
         $l = $i;
     }
-    //
 
-    //
-    for($i = min($rows, $cols) - 1; $i >= 0; $i--){
+    /* accumulate the left-hand transformation */
+    for ($i = $n - 1; $i >= 0; $i--) {
         $l = $i + 1;
-        $g = $W[$i];
-        for($j = $l; $j < $cols; $j++) $U[$i][$j] = DF_ZERO;
-        if($g != 0.0){
+        $g = (double)$w[$i];
+        if ($i < $n - 1)
+            for ($j = $l; $j < $n; $j++)
+                $a[$i][$j] = 0.0;
+        if ($g) {
             $g = 1.0 / $g;
-            for($j = $l; $j < $cols; $j++){
-                for($s = 0.0, $k = $l; $k < $rows; $k++) $s += $U[$k][$i] * $U[$k][$j];
-                $f = ($s / $U[$i][$i]) * $g;
-                for($k = $i; $k < $rows; $k++) $U[$k][$j] += $f * $U[$k][$i];
+            if ($i != $n - 1) {
+                for ($j = $l; $j < $n; $j++) {
+                    for ($s = 0.0, $k = $l; $k < $m; $k++)
+                        $s += ((double)$a[$k][$i] * (double)$a[$k][$j]);
+                    $f = ($s / (double)$a[$i][$i]) * $g;
+                    for ($k = $i; $k < $m; $k++)
+                        $a[$k][$j] += (double)($f * (double)$a[$k][$i]);
+                }
             }
-            for($j = $i; $j < $rows; $j++) $U[$j][$i] *= $g;
-        }else {
-            for($j = $i; $j < $rows; $j++) $U[$j][$i] = DF_ZERO;
+            for ($j = $i; $j < $m; $j++)
+                $a[$j][$i] = (double)((double)$a[$j][$i] * $g);
+        } else {
+            for ($j = $i; $j < $m; $j++)
+                $a[$j][$i] = 0.0;
         }
-        ++$U[$i][$i];
+        ++$a[$i][$i];
     }
-    //
 
-    //
-    for($k = $cols - 1; $k >= 0; $k--){
-        for($its = 0; $its < 30; $its++){
-            $flag = true;
-            for($l = $k; $l >= 0; $l--){
+    /* diagonalize the bidiagonal form */
+    for ($k = $n - 1; $k >= 0; $k--) {                             /* loop over singular values */
+        for ($its = 0; $its < 30; $its++) {                         /* loop over allowed iterations */
+            $flag = 1;
+            for ($l = $k; $l >= 0; $l--) {                     /* test for splitting */
                 $nm = $l - 1;
-                if( $l == 0 || abs($rv1[$l]) <= $eps*$anorm){
-                    $flag = false;
+                if (abs($rv1[$l]) + $anorm == $anorm) {
+                    $flag = 0;
                     break;
                 }
-                if(abs($W[$nm]) <= $eps*$anorm) break;
+                if (abs((double)$w[$nm]) + $anorm == $anorm)
+                    break;
             }
-            if($flag){
-                $c = 0.0;  // Cancellation of rv1[l], if l > 0.
+            if ($flag) {
+                $c = 0.0;
                 $s = 1.0;
-                for($i = $l; $i < $k + 1; $i++){
+                for ($i = $l; $i <= $k; $i++) {
                     $f = $s * $rv1[$i];
-                    $rv1[$i] = $c * $rv1[$i];
-                    if(abs($f) <= $eps*$anorm) break;
-                    $g = $W[$i];
-                    $h = pythag($f,$g);
-                    $W[$i] = $h;
-                    $h = 1.0 / $h;
-                    $c = $g * $h;
-                    $s = -$f * $h;
-                    for($j = 0; $j < $rows; $j++){
-                        $y = $U[$j][$nm];
-                        $z = $U[$j][$i];
-                        $U[$j][$nm] = $y * $c + $z * $s;
-                        $U[$j][$i] = $z * $c - $y * $s;
+                    if (abs($f) + $anorm != $anorm) {
+                        $g = (double)$w[$i];
+                        $h = PYTHAG($f, $g);
+                        $w[$i] = (double)$h;
+                        $h = 1.0 / $h;
+                        $c = $g * $h;
+                        $s = (-$f * $h);
+                        for ($j = 0; $j < $m; $j++) {
+                            $y = (double)$a[$j][$nm];
+                            $z = (double)$a[$j][$i];
+                            $a[$j][$nm] = (double)($y * $c + $z * $s);
+                            $a[$j][$i] = (double)($z * $c - $y * $s);
+                        }
                     }
                 }
             }
-            $z = $W[$k];
-            if($l == $k){
-                if($z < 0.0){
-                    $W[$k] = -$z; // Singular value is made nonnegative.
-                    for($j = 0; $j < $cols; $j++) $V[$j][$k] = -$V[$j][$k];
+            $z = (double)$w[$k];
+            if ($l == $k) {                  /* convergence */
+                if ($z < 0.0) {              /* make singular value nonnegative */
+                    $w[$k] = (double)(-$z);
+                    for ($j = 0; $j < $n; $j++)
+                        $v[$j][$k] = (-$v[$j][$k]);
                 }
                 break;
             }
-            if($its == 29) print("no convergence in 30 svd iterations");
-            $x = $W[$l]; // Shift from bottom 2-by-2 minor.
+            if ($its >= 30) {
+                print("No convergence after 30,000! iterations \n");
+                return (0);
+            }
+
+            /* shift from bottom 2 x 2 minor */
+            $x = (double)$w[$l];
             $nm = $k - 1;
-            $y = $W[$nm];
+            $y = (double)$w[$nm];
             $g = $rv1[$nm];
             $h = $rv1[$k];
             $f = (($y - $z) * ($y + $z) + ($g - $h) * ($g + $h)) / (2.0 * $h * $y);
-            $g = pythag($f,1.0);
-            $f = (($x - $z) * ($x + $z) + $h * (($y / ($f + sameSign($g,$f))) - $h)) / $x;
+            $g = PYTHAG($f, 1.0);
+            $f = (($x - $z) * ($x + $z) + $h * (($y / ($f + SIGN($g, $f))) - $h)) / $x;
+
+            /* next QR transformation */
             $c = $s = 1.0;
-            for($j = $l; $j <= $nm; $j++){
+            for ($j = $l; $j <= $nm; $j++) {
                 $i = $j + 1;
                 $g = $rv1[$i];
-                $y = $W[$i];
+                $y = (double)$w[$i];
                 $h = $s * $g;
                 $g = $c * $g;
-                $z = pythag($f,$h);
+                $z = PYTHAG($f, $h);
                 $rv1[$j] = $z;
                 $c = $f / $z;
                 $s = $h / $z;
                 $f = $x * $c + $g * $s;
                 $g = $g * $c - $x * $s;
                 $h = $y * $s;
-                $y *= $c;
-                for($jj = 0; $jj < $cols; $jj++){
-                    $x = $V[$jj][$j];
-                    $z = $V[$jj][$i];
-                    $V[$jj][$j] = $x * $c + $z * $s;
-                    $V[$jj][$i] = $z * $c - $x * $s;
+                $y = $y * $c;
+                for ($jj = 0; $jj < $n; $jj++) {
+                    $x = (double)$v[$jj][$j];
+                    $z = (double)$v[$jj][$i];
+                    $v[$jj][$j] = (double)($x * $c + $z * $s);
+                    $v[$jj][$i] = (double)($z * $c - $x * $s);
                 }
-                $z = pythag($f,$h);
-                $W[$j] = $z;  // Rotation can be arbitrary if z = 0.
-                if($z){
+                $z = PYTHAG($f, $h);
+                $w[$j] = (double)$z;
+                if ($z) {
                     $z = 1.0 / $z;
                     $c = $f * $z;
                     $s = $h * $z;
                 }
-                $f = $c * $g + $s * $y;
-                $x = $c * $y - $s * $g;
-                for($jj = 0; $jj < $rows; $jj++){
-                    $y = $U[$jj][$j];
-                    $z = $U[$jj][$i];
-                    $U[$jj][$j] = $y * $c + $z * $s;
-                    $U[$jj][$i] = $z * $c - $y * $s;
+                $f = ($c * $g) + ($s * $y);
+                $x = ($c * $y) - ($s * $g);
+                for ($jj = 0; $jj < $m; $jj++) {
+                    $y = (double)$a[$jj][$j];
+                    $z = (double)$a[$jj][$i];
+                    $a[$jj][$j] = (double)($y * $c + $z * $s);
+                    $a[$jj][$i] = (double)($z * $c - $y * $s);
                 }
             }
             $rv1[$l] = 0.0;
             $rv1[$k] = $f;
-            $W[$k] = $x;
+            $w[$k] = (double)$x;
         }
     }
-    //
 
-    //
-    $inc = 1;
-    do {
-        $inc *= 3;
-        $inc++;
-    }   while($inc <= $cols);
+    return (1);
+}
 
-    do {
-        $inc /= 3;
-        for($i = $inc; $i < $cols; $i++){
-            $sw = $W[$i];
-            for($k = 0; $k < $rows; $k++) $su[$k] = $U[$k][$i];
-            for($k = 0; $k < $cols; $k++) $sv[$k] = $V[$k][$i];
-            $j = $i;
-            while($W[$j - $inc] < $sw){
-                $W[$j] = $W[$j - $inc];
-                for($k = 0; $k < $rows; $k++) $U[$k][$j] = $U[$k][$j - $inc];
-                for($k = 0; $k < $cols; $k++) $V[$k][$j] = $V[$k][$j - $inc];
-                $j -= $inc;
-                if($j < $inc) break;
-            }
-            $W[$j] = $sw;
-            for($k = 0; $k < $rows; $k++) $U[$k][$j] = $su[$k];
-            for($k = 0; $k < $cols; $k++) $V[$k][$j] = $sv[$k];
-        }
-    }  while($inc > 1);
+//-------------------------------------------
 
-    //
-    for($k = 0; $k < $cols; $k++){
-        $s = 0;
-        for($i = 0; $i < $rows; $i++) if ($U[$i][$k] < DF_ZERO) $s++;
-        for($j = 0; $j < $cols; $j++) if ($V[$j][$k] < DF_ZERO) $s++;
-        if($s > ($cols + $rows)/2) {
-            for($i = 0; $i < $rows; $i++) $U[$i][$k] = - $U[$i][$k];
-            for($j = 0; $j < $cols; $j++) $V[$j][$k] = - $V[$j][$k];
-        }
+
+
+/**
+ * @param array $a
+ * @return array [$U, $V, $S]
+ */
+function svd(array $a):array {
+    $s = [];
+    $v = [];
+    dsvd($a, count($a), count($a[0]), $s, $v);
+    return [$a, $v, $s];
+}
+
+
+$stopWords = null;
+
+/**
+ * @param string $word
+ * @return bool
+ */
+function isStopWords(string $word):bool {
+    global $stopWords;
+    if(is_null($stopWords)) {
+        $stopWords = require_once 'stop_words.php';
     }
-    //
-    //
-
-
-    $S = [];
-    // prepare S matrix as n*n daigonal matrix of singular values
-    for($i = 0; $i < $cols; $i++){
-        $S[$i] = array_fill(0, $cols, DF_ZERO);
-        $S[$i][$i] = $W[$i];
+    if($word == 'они') {
+       // var_dump($stopWords[$word]);
+       // exit();
     }
-    //
-
-    return [
-        $U,
-        trans($V),
-        $S,
-    ];
+    return isset($stopWords[$word]);
 }

@@ -50,4 +50,22 @@ class TransformTextByKeyWord implements ITransformTextToMatrix
         }
         return $M;
     }
+
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function save(IPersistent $persistent)
+    {
+        $persistent->save('keywords', $this->keyWords);
+    }
+
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function load(IPersistent $persistent)
+    {
+        $this->keyWords = $persistent->load('keywords');
+    }
 }

@@ -6,7 +6,7 @@ namespace PHPLsa;
  * Class LSA
  * @package PHPLsa
  */
-class LSA
+class LSA implements ILearn
 {
 
 
@@ -117,14 +117,26 @@ class LSA
      * @param IPersistent $persistent
      */
     public function save(IPersistent $persistent) {
+        $persistent->save('components', $this->components);
 
+        $this->getTextTransformer()->save($persistent);
+
+        foreach ($this->textMatrixTransformers as $textMatrixTransformer) {
+            $textMatrixTransformer->save($persistent);
+        }
     }
 
     /**
      * @param IPersistent $persistent
      */
     public function load(IPersistent $persistent) {
+        $this->components = $persistent->load('components', $this->components);
 
+        $this->getTextTransformer()->load($persistent);
+
+        foreach ($this->textMatrixTransformers as $textMatrixTransformer) {
+            $textMatrixTransformer->load($persistent);
+        }
     }
 
     /**
@@ -176,6 +188,15 @@ class LSA
      */
     public function setTextTransformer(ITransformTextToMatrix $textTransformer) {
         $this->textTransformer = $textTransformer;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getComponents(): array
+    {
+        return $this->components;
     }
 
      /**

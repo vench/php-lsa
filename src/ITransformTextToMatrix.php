@@ -14,4 +14,15 @@ interface ITransformTextToMatrix
      */
     public function transform(array $arDocuments):array;
 
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function save(IPersistent $persistent);
+
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function load(IPersistent $persistent);
 }

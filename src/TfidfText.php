@@ -45,5 +45,23 @@ class TfidfText implements ILearn
     public function transform(array $M): array {
         return mult($this->transform, $M);
     }
+
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function save(IPersistent $persistent)
+    {
+        $persistent->save('tfidftext', $this->transform);
+    }
+
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function load(IPersistent $persistent)
+    {
+        // TODO: Implement load() method.
+    }
 }
 

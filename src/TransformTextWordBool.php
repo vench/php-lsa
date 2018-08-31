@@ -59,6 +59,10 @@ class TransformTextWordBool implements ITransformTextToMatrix
             if(isset($maths[0])) {
                 foreach ($maths[0] as $word) {
                     $word = $this->processedWord($word);
+                    if(isStopWords($word)) {
+                        continue;
+                    }
+
                     if(isset($this->wordDict[$word])) {
                         if(!isset($M[$this->wordDict[$word]][$i])) {
                             $M[$this->wordDict[$word]] = array_fill(0, count($arDocuments), 0);
@@ -98,5 +102,23 @@ class TransformTextWordBool implements ITransformTextToMatrix
      */
     protected function setValueToResult(int &$address, $value) {
         $address = $value;
+    }
+
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function save(IPersistent $persistent)
+    {
+        $persistent->save('worddict', $this->wordDict);
+    }
+
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function load(IPersistent $persistent)
+    {
+        $this->wordDict = $persistent->load('worddict');
     }
 }

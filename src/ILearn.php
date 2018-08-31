@@ -25,4 +25,16 @@ interface ILearn
      * @return array
      */
     public function fitTransform(array $A):array;
+
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function save(IPersistent $persistent);
+
+    /**
+     * @param IPersistent $persistent
+     * @return mixed
+     */
+    public function load(IPersistent $persistent);
 }

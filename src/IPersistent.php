@@ -11,7 +11,16 @@ namespace PHPLsa;
 
 interface IPersistent
 {
-    public function savePartData(array $data);
+    /**
+     * @param $key
+     * @param array $data
+     * @return mixed
+     */
+    public function save($key, array $data);
 
-    public function loadPartData():array;
+    /**
+     * @param $key
+     * @return array
+     */
+    public function load($key):array;
 }
