@@ -87,6 +87,7 @@ class TestPhpLib extends TestCase
         $this->assertTrue(true);
     }
 
+    /*
     public function testTime() {
         $start = microtime(true);
         $M = [
@@ -118,5 +119,5 @@ class TestPhpLib extends TestCase
         //echo 't2: ', $diff1, PHP_EOL;
 
         $this->assertTrue($diff1 > $diff, 'svd slowly _svd');
-    }
+    }*/
 }
