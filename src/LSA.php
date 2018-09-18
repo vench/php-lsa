@@ -152,12 +152,37 @@ class LSA implements ILearn
 
 
     /**
+     * @param $index
+     * @param array $trans
+     * @return int
+     * @throws \Exception
+     */
+    public function queryByIndex($index, array $trans) {
+        if(!isset($trans[$index])) {
+            throw new \Exception('Index not found in $trans array');
+        }
+        $qTrans = $trans[$index];
+        unset($trans[$index]);
+        return $this->_query($qTrans, $trans);
+    }
+
+    /**
      * @param $query
      * @param array $trans
      * @return int
      */
-    public function query($query, array $trans) {
+    public function query($query, array $trans)
+    {
         $qTrans = $this->transform([$query]);
+        return $this->_query($qTrans, $trans);
+    }
+
+    /**
+     * @param $qTrans
+     * @param $trans
+     * @return int
+     */
+    private function _query($qTrans, $trans) {
         $index = -1;
         $weight = 0;
         $alpha = 0.0001;
