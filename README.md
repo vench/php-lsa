@@ -2,6 +2,12 @@
 
 Singular value decomposition in PHP implementation language.
 
+This package can analyze texts to find a relation with given terms.
+
+It can take an array with text document strings and transform them so they can be queried.
+
+The package can also take a given text and perform a query to return the index of the document that matches better text that was given in the original array of text documents.
+
 #### Install
 
 ```composer require vench/php-lsa```
