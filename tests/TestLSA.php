@@ -1,6 +1,6 @@
 <?php
 
-require '../vendor/autoload.php';
+namespace PHPLsa\Tests;
 
 use PHPUnit\Framework\TestCase;
 use  PHPLsa\LSA;
@@ -19,7 +19,7 @@ class TestLSA extends TestCase
                      'away', 'spoon',  ];
         $transformText = new \PHPLsa\TransformTextByKeyWord($keyWords);
         $trans = $transformText->transform(['ABC']);
-        $this->assertTrue(count($keyWords) == count($trans));
+        $this->assertSame(count($keyWords), count($trans));
 
         $lsa = new LSA(4);
         $lsa->setTextTransformer($transformText);
@@ -45,7 +45,7 @@ class TestLSA extends TestCase
         $index = $lsa->query($query, $trans);
        // echo $documents[$index], PHP_EOL;
 
-        $this->assertTrue($index == 0);
+        $this->assertSame(0, $index);
     }
 
 
@@ -65,11 +65,11 @@ class TestLSA extends TestCase
         $lsa = new LSA(4);
         $lsa->addTextMatrixTransformer(new \PHPLsa\TfidfText());
         $trans = $lsa->fitTransform($documents);
-        $this->assertTrue(!empty($trans));
+        $this->assertNotEmpty($trans);
 
         $query = "Тедди просто секси";
         $index = $lsa->query($query, $trans);
         //echo $documents[ $index];
-        $this->assertTrue($index == 3);
+        $this->assertSame(3, $index);
     }
 }

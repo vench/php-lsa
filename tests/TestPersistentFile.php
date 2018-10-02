@@ -1,7 +1,6 @@
 <?php
 
-
-require '../vendor/autoload.php';
+namespace PHPLsa\Tests;
 
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +17,7 @@ class TestPersistentFile extends TestCase
         $dir = dirname(__FILE__) . '/../data';
         $pFile = new \PHPLsa\PersistentFile($dir);
         $pFile->save('test', [1,2,3]);
-        $this->assertTrue(file_exists($dir . '/test'));
+        $this->assertFileExists($dir . '/test');
         return $pFile;
     }
 
@@ -29,7 +28,7 @@ class TestPersistentFile extends TestCase
      */
     public function testLoad(\PHPLsa\PersistentFile $pFile) {
         $data = $pFile->load('test');
-        $this->assertTrue(count($data) == 3);
+        $this->assertCount(3, $data);
         $this->assertArraySubset($data, [1,2,3]);
         return $pFile;
     }
@@ -52,11 +51,11 @@ class TestPersistentFile extends TestCase
         $lsa = new \PHPLsa\LSA(4);
         $lsa->addTextMatrixTransformer(new \PHPLsa\TfidfText());
         $trans = $lsa->fitTransform($documents);
-        $this->assertTrue(!empty($trans));
+        $this->assertNotEmpty($trans);
         $lsa->save($pFile);
 
         $dir = $pFile->getBaseDirectory();
-        $this->assertTrue(file_exists($dir . '/components'));
+        $this->assertFileExists($dir . '/components');
 
         return $pFile;
 
@@ -72,11 +71,11 @@ class TestPersistentFile extends TestCase
         $lsa->addTextMatrixTransformer(new \PHPLsa\TfidfText());
 
         $components = $lsa->getComponents();
-        $this->assertTrue(count($components) == 0);
+        $this->assertCount(0, $components);
 
         $lsa->load($pFile);
 
         $components = $lsa->getComponents();
-        $this->assertTrue(count($components) > 0);
+        $this->assertGreaterThan(0, count($components));
     }
 }

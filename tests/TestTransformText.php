@@ -1,6 +1,6 @@
 <?php
 
-require '../vendor/autoload.php';
+namespace PHPLsa\Tests;
 
 use PHPUnit\Framework\TestCase;
 use PHPLsa\TransformTextByKeyWord;
@@ -14,52 +14,52 @@ class TestTransformText extends TestCase
 {
 
     /**
-     *
+     * @return void
      */
     public function testTransformTextWordBool() {
         $t = new TransformTextWordBool(100);
         $trans = $t->transform(['What is it?', 'It is cat.']);
 
         $wordDictionary = $t->getWordDictionary();
-        $this->assertTrue(count($wordDictionary) == 2);
-        $this->assertTrue(isset($wordDictionary['what']));
-        $this->assertTrue(isset($wordDictionary['cat']));
+        $this->assertCount(2, $wordDictionary);
+        $this->assertSame(0, $wordDictionary['what']);
+        $this->assertSame(1, $wordDictionary['cat']);
 
-        $this->assertTrue($trans[0][0] == 1);
-        $this->assertTrue($trans[0][1] == 0);
+        $this->assertSame(1, $trans[0][0]);
+        $this->assertSame(0, $trans[0][1]);
 
-        $this->assertTrue($trans[1][0] == 0);
-        $this->assertTrue($trans[1][1] == 1);
+        $this->assertSame(0, $trans[1][0]);
+        $this->assertSame(1, $trans[1][1]);
     }
 
     /**
-     *
+     * @return void
      */
     public function testTransformTextWordCount() {
         $t = new TransformTextWordCount(100);
         $trans = $t->transform(['test test eat', 'dog cat fish cat']);
 
         $wordDictionary = $t->getWordDictionary();
-        $this->assertTrue(count($wordDictionary) == 5);
+        $this->assertCount(5, $wordDictionary);
 
-        $this->assertTrue($trans[0][0] == 2);
-        $this->assertTrue($trans[0][1] == 0);
+        $this->assertSame(2, $trans[0][0]);
+        $this->assertSame(0, $trans[0][1]);
 
-        $this->assertTrue($trans[1][0] == 1);
-        $this->assertTrue($trans[1][1] == 0);
+        $this->assertSame(1, $trans[1][0]);
+        $this->assertSame(0, $trans[1][1]);
 
-        $this->assertTrue($trans[2][0] == 0);
-        $this->assertTrue($trans[2][1] == 1);
+        $this->assertSame(0, $trans[2][0]);
+        $this->assertSame(1, $trans[2][1]);
 
-        $this->assertTrue($trans[3][0] == 0);
-        $this->assertTrue($trans[3][1] == 2);
+        $this->assertSame(0, $trans[3][0]);
+        $this->assertSame(2, $trans[3][1]);
 
-        $this->assertTrue($trans[4][0] == 0);
-        $this->assertTrue($trans[4][1] == 1);
+        $this->assertSame(0, $trans[4][0]);
+        $this->assertSame(1, $trans[4][1]);
     }
 
     /**
-     *
+     * @return void
      */
     public function testTransformTextByKeyWord() {
 
@@ -73,7 +73,7 @@ class TestTransformText extends TestCase
 
         $trans = $t->transform($documents);
 
-        $this->assertTrue(count($trans[0]) == count($documents));
+        $this->assertSame(count($trans[0]), count($documents));
 
         $tests = [
             [2,2,0,0],
@@ -83,7 +83,7 @@ class TestTransformText extends TestCase
 
         for ($i = 0; $i < count($tests); $i ++) {
             for ($j = 0; $j < count($tests[0]); $j ++) {
-                $this->assertTrue($tests[$i][$j] ==$trans[$i][$j], "Not equals {$i}{$j}!={$i}{$j}");
+                $this->assertSame($tests[$i][$j], $trans[$i][$j], "Not equals {$i}{$j}!={$i}{$j}");
             }
         }
 
