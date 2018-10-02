@@ -1,6 +1,6 @@
 <?php
 
-require '../vendor/autoload.php';
+namespace PHPLsa\Tests;
 
 use PHPUnit\Framework\TestCase;
 
@@ -10,21 +10,23 @@ use PHPUnit\Framework\TestCase;
 class TestPhpLib extends TestCase
 {
 
-
+    /**
+     * @return void
+     */
     public function testTrunc() {
         $A = [
                 [1,2,3,4],
                 [5,6,7,8],
             ];
-        PHPLsa\trunc($A, 2, 2);
+        \PHPLsa\trunc($A, 2, 2);
 
-        $this->assertTrue(count($A) == 2);
-        $this->assertTrue(count($A[0]) == 2);
+        $this->assertCount(2, $A);
+        $this->assertCount(2, $A[0]);
 
-        $this->assertTrue($A[0][0] == 1);
-        $this->assertTrue($A[0][1] == 2);
-        $this->assertTrue($A[1][0] == 5);
-        $this->assertTrue($A[1][1] == 6);
+        $this->assertSame(1, $A[0][0]);
+        $this->assertSame(2, $A[0][1]);
+        $this->assertSame(5, $A[1][0]);
+        $this->assertSame(6, $A[1][1]);
     }
 
     /**
@@ -53,8 +55,8 @@ class TestPhpLib extends TestCase
 
         $M = \PHPLsa\mult(\PHPLsa\mult( $U,  $k), $V) ;
 
-        $this->assertTrue(count($M) == count($U));
-        $this->assertTrue(count($M[0]) == count($V));
+        $this->assertSame(count($M), count($U));
+        $this->assertSame(count($M[0]), count($V));
 
         return $M;
     }
@@ -74,17 +76,15 @@ class TestPhpLib extends TestCase
 
         for($i = 0; $i < count($M0); $i ++) {
             for($j = 0; $j < count($M0[0]); $j ++) {
-                $this->assertTrue( abs( $M0[$i][$j] - $M[$i][$j]) < 1);
+                $this->assertLessThan(1, abs( $M0[$i][$j] - $M[$i][$j]));
             }
         }
 
         list($U, $V, $S) = \PHPLsa\svd($M);
 
-        $this->assertTrue(!empty($U));
-        $this->assertTrue(!empty($V));
-        $this->assertTrue(!empty($S));
-
-        $this->assertTrue(true);
+        $this->assertNotEmpty($U);
+        $this->assertNotEmpty($V);
+        $this->assertNotEmpty($S);
     }
 
     /*
