@@ -17,7 +17,7 @@ class PersistentFile implements IPersistent
      * PersistentFile constructor.
      * @param $baseDirectory
      */
-    function __construct($baseDirectory = './')
+    public function __construct($baseDirectory = './')
     {
         $this->baseDirectory = $baseDirectory;
     }
@@ -29,7 +29,7 @@ class PersistentFile implements IPersistent
      */
     public function save($key, array $data)
     {
-        $path = rtrim($this->baseDirectory , '/\/'). DIRECTORY_SEPARATOR . $key;
+        $path = rtrim($this->baseDirectory, '/\/'). DIRECTORY_SEPARATOR . $key;
         file_put_contents($path, serialize($data));
     }
 
@@ -39,7 +39,7 @@ class PersistentFile implements IPersistent
      */
     public function load($key): array
     {
-        $path = rtrim($this->baseDirectory , '/\/'). DIRECTORY_SEPARATOR . $key;
+        $path = rtrim($this->baseDirectory, '/\/'). DIRECTORY_SEPARATOR . $key;
         $data = file_get_contents($path);
         return $data ? unserialize($data) : [];
     }
@@ -47,7 +47,8 @@ class PersistentFile implements IPersistent
     /**
      * @return string
      */
-    public function getBaseDirectory() {
+    public function getBaseDirectory()
+    {
         return $this->baseDirectory;
     }
 }

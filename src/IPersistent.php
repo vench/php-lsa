@@ -8,7 +8,6 @@
 
 namespace PHPLsa;
 
-
 interface IPersistent
 {
     /**

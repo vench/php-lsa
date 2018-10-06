@@ -20,7 +20,7 @@ class TransformTextByKeyWord implements ITransformTextToMatrix
      */
     private $keyWords;
 
-    function __construct(array $keyWords)
+    public function __construct(array $keyWords)
     {
         $this->keyWords = $keyWords;
     }
@@ -35,13 +35,12 @@ class TransformTextByKeyWord implements ITransformTextToMatrix
         $M = [];
         $maths = [];
         for ($i = 0; $i < count($arDocuments); $i ++) {
-            for($j = 0; $j < count($this->keyWords); $j ++) {
-
-                if(!isset($M[$j])) {
+            for ($j = 0; $j < count($this->keyWords); $j ++) {
+                if (!isset($M[$j])) {
                     $M[$j] = [];
                 }
 
-                if(preg_match_all("/{$this->keyWords[$j]}/Ui", $arDocuments[$i], $maths)) {
+                if (preg_match_all("/{$this->keyWords[$j]}/Ui", $arDocuments[$i], $maths)) {
                     $M[$j][$i] = count($maths[0]);
                 } else {
                     $M[$j][$i] = 0;

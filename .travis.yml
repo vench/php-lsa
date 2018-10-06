@@ -21,4 +21,6 @@ before_install:
 
 install: composer install --prefer-dist --no-interaction
 
+before_script: ./vendor/bin/phpcs -n --standard=PSR2 src/ tests/
+
 script: ./vendor/bin/phpunit

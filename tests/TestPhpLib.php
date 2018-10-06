@@ -13,7 +13,8 @@ class TestPhpLib extends TestCase
     /**
      * @return void
      */
-    public function testTrunc() {
+    public function testTrunc()
+    {
         $A = [
                 [1,2,3,4],
                 [5,6,7,8],
@@ -32,7 +33,8 @@ class TestPhpLib extends TestCase
     /**
      * @return array
      */
-    public function testMult() {
+    public function testMult()
+    {
         $U = [
             [0,0,1,0],
             [0,1,0,0],
@@ -53,7 +55,7 @@ class TestPhpLib extends TestCase
             [-sqrt(0.8),0,0,0,sqrt(0.2)],
         ];
 
-        $M = \PHPLsa\mult(\PHPLsa\mult( $U,  $k), $V) ;
+        $M = \PHPLsa\mult(\PHPLsa\mult($U, $k), $V) ;
 
         $this->assertSame(count($M), count($U));
         $this->assertSame(count($M[0]), count($V));
@@ -66,7 +68,8 @@ class TestPhpLib extends TestCase
      * @depends testMult
      * @param $M0
      */
-    public function testSVD(array $M0) {
+    public function testSVD(array $M0)
+    {
         $M = [
             [1, 0, 0, 0, 2],
             [0, 0, 3, 0, 0],
@@ -74,9 +77,9 @@ class TestPhpLib extends TestCase
             [0, 4, 0, 0, 0],
         ];
 
-        for($i = 0; $i < count($M0); $i ++) {
-            for($j = 0; $j < count($M0[0]); $j ++) {
-                $this->assertLessThan(1, abs( $M0[$i][$j] - $M[$i][$j]));
+        for ($i = 0; $i < count($M0); $i ++) {
+            for ($j = 0; $j < count($M0[0]); $j ++) {
+                $this->assertLessThan(1, abs($M0[$i][$j] - $M[$i][$j]));
             }
         }
 

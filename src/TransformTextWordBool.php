@@ -29,7 +29,7 @@ class TransformTextWordBool implements ITransformTextToMatrix
      * @param int $nMaxWords
      * @param array $wordDict
      */
-    function __construct($nMaxWords = 100, $wordDict = [])
+    public function __construct($nMaxWords = 100, $wordDict = [])
     {
         $this->nMaxWords = $nMaxWords;
         $this->wordDict = $wordDict;
@@ -38,8 +38,8 @@ class TransformTextWordBool implements ITransformTextToMatrix
     /**
      * @param array $M
      */
-    public function fit(array $M) {
-
+    public function fit(array $M)
+    {
     }
 
     /**
@@ -49,26 +49,28 @@ class TransformTextWordBool implements ITransformTextToMatrix
     public function transform(array $arDocuments): array
     {
 
-        $M = array_fill(0, count($this->wordDict),
-                array_fill(0, count($arDocuments), 0)
-            );
+        $M = array_fill(
+            0,
+            count($this->wordDict),
+            array_fill(0, count($arDocuments), 0)
+        );
 
-        for($i = 0; $i < count($arDocuments); $i ++) {
+        for ($i = 0; $i < count($arDocuments); $i ++) {
             $maths = [];
             preg_match_all($this->pattern, $arDocuments[$i], $maths);
-            if(isset($maths[0])) {
+            if (isset($maths[0])) {
                 foreach ($maths[0] as $word) {
                     $word = $this->processedWord($word);
-                    if(isStopWords($word)) {
+                    if (isStopWords($word)) {
                         continue;
                     }
 
-                    if(isset($this->wordDict[$word])) {
-                        if(!isset($M[$this->wordDict[$word]][$i])) {
+                    if (isset($this->wordDict[$word])) {
+                        if (!isset($M[$this->wordDict[$word]][$i])) {
                             $M[$this->wordDict[$word]] = array_fill(0, count($arDocuments), 0);
                         }
                         $this->setValueToResult($M[$this->wordDict[$word]][$i], 1);
-                    } else if($this->nMaxWords > count($this->wordDict)) {
+                    } elseif ($this->nMaxWords > count($this->wordDict)) {
                         $this->wordDict[$word] = count($this->wordDict);
                         $M[$this->wordDict[$word]] = array_fill(0, count($arDocuments), 0);
                         $this->setValueToResult($M[$this->wordDict[$word]][$i], 1);
@@ -83,7 +85,8 @@ class TransformTextWordBool implements ITransformTextToMatrix
     /**
      * @return array
      */
-    public function getWordDictionary():array {
+    public function getWordDictionary():array
+    {
         return $this->wordDict;
     }
 
@@ -91,7 +94,8 @@ class TransformTextWordBool implements ITransformTextToMatrix
      * @param string $word
      * @return string
      */
-    public function processedWord($word) {
+    public function processedWord($word)
+    {
         return mb_strtolower($word);
     }
 
@@ -100,7 +104,8 @@ class TransformTextWordBool implements ITransformTextToMatrix
      * @param int $address
      * @param $value
      */
-    protected function setValueToResult(int &$address, $value) {
+    protected function setValueToResult(int &$address, $value)
+    {
         $address = $value;
     }
 

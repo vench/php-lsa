@@ -16,7 +16,8 @@ class TestTransformText extends TestCase
     /**
      * @return void
      */
-    public function testTransformTextWordBool() {
+    public function testTransformTextWordBool()
+    {
         $t = new TransformTextWordBool(100);
         $trans = $t->transform(['What is it?', 'It is cat.']);
 
@@ -35,7 +36,8 @@ class TestTransformText extends TestCase
     /**
      * @return void
      */
-    public function testTransformTextWordCount() {
+    public function testTransformTextWordCount()
+    {
         $t = new TransformTextWordCount(100);
         $trans = $t->transform(['test test eat', 'dog cat fish cat']);
 
@@ -61,7 +63,8 @@ class TestTransformText extends TestCase
     /**
      * @return void
      */
-    public function testTransformTextByKeyWord() {
+    public function testTransformTextByKeyWord()
+    {
 
         $t = new TransformTextByKeyWord(['and', 'class', 'PHP']);
         $documents = [
@@ -86,7 +89,5 @@ class TestTransformText extends TestCase
                 $this->assertSame($tests[$i][$j], $trans[$i][$j], "Not equals {$i}{$j}!={$i}{$j}");
             }
         }
-
     }
-
 }

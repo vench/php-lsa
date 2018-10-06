@@ -48,7 +48,7 @@ class LSA implements ILearn
      * @param int $nMaxDocuments
      * @param int $nMaxWords
      */
-    function __construct($nFeatures = 5, $nMaxDocuments = 1000, $nMaxWords = 100)
+    public function __construct($nFeatures = 5, $nMaxDocuments = 1000, $nMaxWords = 100)
     {
         $this->nFeatures = $nFeatures;
         $this->nMaxDocuments = $nMaxDocuments;
@@ -58,7 +58,8 @@ class LSA implements ILearn
     /**
      * @param ILearn $matrixTransformer
      */
-    public function addTextMatrixTransformer(ILearn $matrixTransformer) {
+    public function addTextMatrixTransformer(ILearn $matrixTransformer)
+    {
         $this->textMatrixTransformers[] = $matrixTransformer;
     }
 
@@ -66,7 +67,8 @@ class LSA implements ILearn
      * @param array $arDocuments
      * @return array
      */
-    public function fitTransform(array $arDocuments):array {
+    public function fitTransform(array $arDocuments):array
+    {
         $M = $this->textTransform($arDocuments);
 
         foreach ($this->textMatrixTransformers as $textMatrixTransformer) {
@@ -97,7 +99,8 @@ class LSA implements ILearn
     /**
      * @param array $arDocuments
      */
-    public function fit(array $arDocuments) {
+    public function fit(array $arDocuments)
+    {
         $this->fitTransform($arDocuments);
     }
 
@@ -105,18 +108,20 @@ class LSA implements ILearn
      * @param array $arDocuments
      * @return array
      */
-    public function transform(array $arDocuments):array {
+    public function transform(array $arDocuments):array
+    {
         $M = $this->textTransform($arDocuments);
         foreach ($this->textMatrixTransformers as $textMatrixTransformer) {
             $M = $textMatrixTransformer->transform($M);
         }
-        return mult($this->components,  $M);
+        return mult($this->components, $M);
     }
 
     /**
      * @param IPersistent $persistent
      */
-    public function save(IPersistent $persistent) {
+    public function save(IPersistent $persistent)
+    {
         $persistent->save('components', $this->components);
 
         $this->getTextTransformer()->save($persistent);
@@ -129,7 +134,8 @@ class LSA implements ILearn
     /**
      * @param IPersistent $persistent
      */
-    public function load(IPersistent $persistent) {
+    public function load(IPersistent $persistent)
+    {
         $this->components = $persistent->load('components', $this->components);
 
         $this->getTextTransformer()->load($persistent);
@@ -142,10 +148,12 @@ class LSA implements ILearn
     /**
      * @return ITransformTextToMatrix
      */
-    public function getTextTransformer() {
-        if(is_null($this->textTransformer)) {
+    public function getTextTransformer()
+    {
+        if (is_null($this->textTransformer)) {
             $this->setTextTransformer(
-                new TransformTextWordBool($this->nMaxWords) );
+                new TransformTextWordBool($this->nMaxWords)
+            );
         }
         return $this->textTransformer;
     }
@@ -157,8 +165,9 @@ class LSA implements ILearn
      * @return int
      * @throws \Exception
      */
-    public function queryByIndex($index, array $trans) {
-        if(!isset($trans[$index])) {
+    public function queryByIndex($index, array $trans)
+    {
+        if (!isset($trans[$index])) {
             throw new \Exception('Index not found in $trans array');
         }
         $qTrans = $trans[$index];
@@ -182,23 +191,24 @@ class LSA implements ILearn
      * @param $trans
      * @return int
      */
-    private function _query($qTrans, $trans) {
+    private function _query($qTrans, $trans)
+    {
         $index = -1;
         $weight = 0;
         $alpha = 0.0001;
-        for($n = 0; $n < count($trans[0]); $n++) {
+        for ($n = 0; $n < count($trans[0]); $n++) {
             $sum = 0.0;
             $sum1 = 0.0;
             $sum2 = 0.0;
 
-            for($i = 0; $i < count($trans); $i++) {
+            for ($i = 0; $i < count($trans); $i++) {
                 $sum += $trans[$i][$n] * $qTrans[$i][0];
                 $sum1 += $trans[$i][$n] * $trans[$i][$n];
                 $sum2 += $qTrans[$i][0] * $qTrans[$i][0];
             }
 
-            $w = abs(  $sum / (sqrt($sum1  + $alpha) * sqrt($sum2  + $alpha) ));
-            if($index == -1 || $w > $weight) {
+            $w = abs($sum / (sqrt($sum1  + $alpha) * sqrt($sum2  + $alpha) ));
+            if ($index == -1 || $w > $weight) {
                 $index = $n;
                 $weight = $w;
             }
@@ -211,7 +221,8 @@ class LSA implements ILearn
     /**
      * @param ITransformTextToMatrix $textTransformer
      */
-    public function setTextTransformer(ITransformTextToMatrix $textTransformer) {
+    public function setTextTransformer(ITransformTextToMatrix $textTransformer)
+    {
         $this->textTransformer = $textTransformer;
     }
 
@@ -228,11 +239,9 @@ class LSA implements ILearn
      * @param array $arDocuments
      * @return array
      */
-    private function textTransform(array $arDocuments):array {
+    private function textTransform(array $arDocuments):array
+    {
         return $this->getTextTransformer()
             ->transform(array_slice($arDocuments, 0, $this->nMaxDocuments));
     }
-
-
-
 }
