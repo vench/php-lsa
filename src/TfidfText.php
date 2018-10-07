@@ -18,7 +18,8 @@ class TfidfText implements ILearn
      * @param array $M
      * @return array
      */
-    public function fitTransform(array $M):array {
+    public function fitTransform(array $M):array
+    {
         $this->fit($M);
         return $this->transform($M);
     }
@@ -26,7 +27,8 @@ class TfidfText implements ILearn
     /**
      * @param array $M
      */
-    public function fit(array $M) {
+    public function fit(array $M)
+    {
         $rows = count($M);
         $cols = count($M[0]);
         $this->transform = [];
@@ -42,7 +44,8 @@ class TfidfText implements ILearn
      * @param array $M
      * @return array
      */
-    public function transform(array $M): array {
+    public function transform(array $M): array
+    {
         return mult($this->transform, $M);
     }
 
@@ -64,4 +67,3 @@ class TfidfText implements ILearn
         // TODO: Implement load() method.
     }
 }
-

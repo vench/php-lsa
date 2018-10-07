@@ -13,7 +13,8 @@ class TransformTextWordCount extends TransformTextWordBool
      * @param int $address
      * @param $value
      */
-    protected function setValueToResult(int &$address, $value) {
+    protected function setValueToResult(int &$address, $value)
+    {
         $address += $value;
     }
 }

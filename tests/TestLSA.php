@@ -3,7 +3,7 @@
 namespace PHPLsa\Tests;
 
 use PHPUnit\Framework\TestCase;
-use  PHPLsa\LSA;
+use PHPLsa\LSA;
 
 /**
  * Class TestLSA
@@ -13,7 +13,8 @@ class TestLSA extends TestCase
     /**
      * @return LSA
      */
-    public function testInitLsa() {
+    public function testInitLsa()
+    {
         $keyWords = ['quick', 'brown', 'fox', 'jumped', 'lazy', 'dog', 'hey', 'diddle', 'cat',
                      'fiddle', 'cow',  'moon', 'little', 'laughed', 'fun',  'dish', 'ran',
                      'away', 'spoon',  ];
@@ -31,7 +32,8 @@ class TestLSA extends TestCase
      * @param LSA $lsa
      * @depends testInitLsa
      */
-    public function testFit(LSA $lsa) {
+    public function testFit(LSA $lsa)
+    {
         $documents = [
             "The quick brown fox jumped over the lazy dog",
             "hey diddle diddle, the cat and the fiddle",
@@ -52,7 +54,8 @@ class TestLSA extends TestCase
     /**
      *
      */
-    public function testRu() {
+    public function testRu()
+    {
         $documents = [
             'В список таких мест попал Эрмитаж – в подвалах музея сейчас живут 50-60 кошек и котов.  Также любителям кошек рекомендуется побывать в доме-музее Хэмингуэя во Флориде, где живут 57 котов, в Музее кошки в Амстердаме и в литовском Музее кошек в Шяуляе – там собрано около 10 тысяч экспонатов со всего мира: скульптуры, фотографии, витражи с изображением кошек.',
             'Имена для кошек подбираются хозяевами тщательно и обдуманно. Некоторые размышляют над именем еще до появления в доме пушистого комочка. Как назвать кота, приходит в голову и при первой встрече с новым членом семьи. Кошачьи имена подбирают исходя из характера, внешнего вида и даже гастрономических предпочтений питомцев.',

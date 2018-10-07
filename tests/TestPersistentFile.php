@@ -13,7 +13,8 @@ class TestPersistentFile extends TestCase
     /**
      * @return \PHPLsa\PersistentFile
      */
-    public function testSave() {
+    public function testSave()
+    {
         $dir = dirname(__FILE__) . '/../data';
         $pFile = new \PHPLsa\PersistentFile($dir);
         $pFile->save('test', [1,2,3]);
@@ -26,7 +27,8 @@ class TestPersistentFile extends TestCase
      * @depends testSave
      * @return \PHPLsa\PersistentFile
      */
-    public function testLoad(\PHPLsa\PersistentFile $pFile) {
+    public function testLoad(\PHPLsa\PersistentFile $pFile)
+    {
         $data = $pFile->load('test');
         $this->assertCount(3, $data);
         $this->assertArraySubset($data, [1,2,3]);
@@ -38,7 +40,8 @@ class TestPersistentFile extends TestCase
      * @return \PHPLsa\PersistentFile
      * @depends testLoad
      */
-    public function testLSASave(\PHPLsa\PersistentFile $pFile) {
+    public function testLSASave(\PHPLsa\PersistentFile $pFile)
+    {
 
         $documents = [
             'В список таких мест попал Эрмитаж – в подвалах музея сейчас живут 50-60 кошек и котов.  Также любителям кошек рекомендуется побывать в доме-музее Хэмингуэя во Флориде, где живут 57 котов, в Музее кошки в Амстердаме и в литовском Музее кошек в Шяуляе – там собрано около 10 тысяч экспонатов со всего мира: скульптуры, фотографии, витражи с изображением кошек.',
@@ -58,14 +61,14 @@ class TestPersistentFile extends TestCase
         $this->assertFileExists($dir . '/components');
 
         return $pFile;
-
     }
 
     /**
      * @param \PHPLsa\PersistentFile $pFile
      * @depends testLSASave
      */
-    public function testLSALoad(\PHPLsa\PersistentFile $pFile) {
+    public function testLSALoad(\PHPLsa\PersistentFile $pFile)
+    {
 
         $lsa = new \PHPLsa\LSA(4);
         $lsa->addTextMatrixTransformer(new \PHPLsa\TfidfText());
